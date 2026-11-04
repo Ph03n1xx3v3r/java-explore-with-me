@@ -11,14 +11,16 @@ import ru.practicum.ewm.stats.dto.ViewStats;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;\nimport static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;\nimport static org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam;\nimport static org.hamcrest.Matchers.startsWith;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.http.HttpStatus.CREATED;
 
 class StatsClientTest {
+
     @Test
     void shouldSendHitToStatsServer() {
         RestTemplate restTemplate = new RestTemplate();
