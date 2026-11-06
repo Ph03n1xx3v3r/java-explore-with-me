@@ -8,7 +8,7 @@ import ru.practicum.ewm.stats.server.repository.HitRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
 
 @Service
 public class StatsService {
@@ -27,7 +27,8 @@ public class StatsService {
         repository.save(hit);
     }
 
-    public List<ViewStats> getStats(String startValue, String endValue, List<String> uris, boolean unique) {
+    public List<ViewStats> getStats(String startValue, String endValue, List<String> uris,
+                                    boolean unique) {
         LocalDateTime start = LocalDateTime.parse(startValue, FORMATTER);
         LocalDateTime end = LocalDateTime.parse(endValue, FORMATTER);
 
@@ -35,47 +36,12 @@ public class StatsService {
             throw new IllegalArgumentException("Start date must not be after end date");
         }
 
-        List<Hit> hits = (uris == null || uris.isEmpty())
-                ? repository.findByTimestampBetween(start, end)
-                : repository.findByTimestampBetweenAndUriIn(start, end, uris);
+        List<HitRepository.StatsViewProjection> rows = uris == null || uris.isEmpty()
+                ? repository.findStats(start, end, unique)
+                : repository.findStatsByUris(start, end, uris, unique);
 
-        Map<StatsKey, StatsCounter> counters = new HashMap<>();
-        for (Hit hit : hits) {
-            StatsKey key = new StatsKey(hit.getApp(), hit.getUri());
-            StatsCounter counter = counters.computeIfAbsent(key, ignored -> new StatsCounter());
-            counter.add(hit.getIp());
-        }
-
-        List<ViewStats> result = new ArrayList<>();
-        for (Map.Entry<StatsKey, StatsCounter> entry : counters.entrySet()) {
-            long count = unique ? entry.getValue().uniqueCount() : entry.getValue().totalCount();
-            result.add(new ViewStats(entry.getKey().app(), entry.getKey().uri(), count));
-        }
-
-        result.sort(Comparator.comparing(ViewStats::getHits).reversed()
-                .thenComparing(ViewStats::getApp)
-                .thenComparing(ViewStats::getUri));
-        return result;
-    }
-
-    private record StatsKey(String app, String uri) {
-    }
-
-    private static class StatsCounter {
-        private long total;
-        private final Set<String> ips = new HashSet<>();
-
-        void add(String ip) {
-            total++;
-            ips.add(ip);
-        }
-
-        long totalCount() {
-            return total;
-        }
-
-        long uniqueCount() {
-            return ips.size();
-        }
+        return rows.stream()
+                .map(row -> new ViewStats(row.getApp(), row.getUri(), row.getHits()))
+                .toList();
     }
 }
