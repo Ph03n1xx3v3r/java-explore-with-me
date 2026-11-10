@@ -1,14 +1,64 @@
 services:
   stats-server:
+    build:
+      context: .
+      dockerfile: ewm-stats-server/Dockerfile
     ports:
       - "9090:9090"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/ewm_stats
+      SPRING_DATASOURCE_USERNAME: ewm
+      SPRING_DATASOURCE_PASSWORD: ewm
+    depends_on:
+      stats-db:
+        condition: service_healthy
 
   stats-db:
     image: postgres:16.1
+    environment:
+      POSTGRES_DB: ewm_stats
+      POSTGRES_USER: ewm
+      POSTGRES_PASSWORD: ewm
+    ports:
+      - "5433:5432"
+    volumes:
+      - stats-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ewm -d ewm_stats"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
+  # Main service is intentionally a placeholder during stage 1.
+  # It is excluded from the default compose run and will be implemented in stage 2.
   ewm-service:
+    profiles: ["stage2"]
+    build:
+      context: .
+      dockerfile: ewm-main-service/Dockerfile
     ports:
       - "8080:8080"
+    depends_on:
+      ewm-db:
+        condition: service_healthy
 
   ewm-db:
+    profiles: ["stage2"]
     image: postgres:16.1
+    environment:
+      POSTGRES_DB: ewm_main
+      POSTGRES_USER: ewm
+      POSTGRES_PASSWORD: ewm
+    ports:
+      - "5432:5432"
+    volumes:
+      - main-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ewm -d ewm_main"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  stats-data:
+  main-data:
