@@ -264,8 +264,10 @@ public class MainService {
     public EventFullDto updateAdminEvent(long id, UpdateEventAdminRequest d) {
         EventEntity e = event(id);
         CategoryEntity c = d.category() == null ? null : category(d.category());
+        if (d.eventDate() != null && d.eventDate().isBefore(LocalDateTime.now().plusHours(1)))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Event date must be at least one hour in the future");
         if (d.eventDate() != null && e.getPublishedOn() != null && d.eventDate().isBefore(e.getPublishedOn().plusHours(1)))
-            throw conflict("Event date must be at least one hour after publication");
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Event date must be at least one hour after publication");
         e.update(d.annotation(), c, d.description(), d.eventDate(), d.location() == null ? null : d.location().lat(), d.location() == null ? null : d.location().lon(), d.paid(), d.participantLimit(), d.requestModeration(), d.title());
         if ("PUBLISH_EVENT".equals(d.stateAction())) {
             if (!"PENDING".equals(e.getState())) throw conflict("Only pending events can be published");

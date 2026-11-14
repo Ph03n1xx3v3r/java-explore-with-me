@@ -81,7 +81,7 @@ public class MainController {
     }
 
     @PatchMapping("/users/{userId}/events/{eventId}")
-    public EventFullDto updateUserEvent(@PathVariable long userId, @PathVariable long eventId, @RequestBody UpdateEventUserRequest d) {
+    public EventFullDto updateUserEvent(@PathVariable long userId, @PathVariable long eventId, @Valid @RequestBody UpdateEventUserRequest d) {
         return service.updateUserEvent(userId, eventId, d);
     }
 
@@ -91,7 +91,7 @@ public class MainController {
     }
 
     @PatchMapping("/admin/events/{eventId}")
-    public EventFullDto updateAdminEvent(@PathVariable long eventId, @RequestBody UpdateEventAdminRequest d) {
+    public EventFullDto updateAdminEvent(@PathVariable long eventId, @Valid @RequestBody UpdateEventAdminRequest d) {
         return service.updateAdminEvent(eventId, d);
     }
 
@@ -112,7 +112,7 @@ public class MainController {
     }
 
     @PatchMapping("/admin/compilations/{compId}")
-    public CompilationDto updateCompilation(@PathVariable long compId, @RequestBody UpdateCompilationRequest d) {
+    public CompilationDto updateCompilation(@PathVariable long compId, @Valid @RequestBody UpdateCompilationRequest d) {
         return service.updateCompilation(compId, d);
     }
 
