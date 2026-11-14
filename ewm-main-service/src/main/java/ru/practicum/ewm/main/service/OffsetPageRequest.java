@@ -2,7 +2,8 @@ package ru.practicum.ewm.main.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-    public class OffsetPageRequest implements Pageable {
+
+public class OffsetPageRequest implements Pageable {
 
     private final long offset;
     private final int pageSize;
@@ -14,12 +15,12 @@ import org.springframework.data.domain.Sort;
 
             throw new IllegalArgumentException("Offset must be non-negative and size must be positive");
 
-}
+        }
         this.offset = offset;
         this.pageSize = pageSize;
-        this.sort = sort == null  ?  Sort.unsorted()  :  sort;
+        this.sort = sort == null ? Sort.unsorted() : sort;
 
-}
+    }
 
     @Override
 
@@ -27,7 +28,7 @@ import org.springframework.data.domain.Sort;
 
         return (int) (offset / pageSize);
 
-}
+    }
 
     @Override
 
@@ -35,7 +36,7 @@ import org.springframework.data.domain.Sort;
 
         return pageSize;
 
-}
+    }
 
     @Override
 
@@ -43,7 +44,7 @@ import org.springframework.data.domain.Sort;
 
         return offset;
 
-}
+    }
 
     @Override
 
@@ -51,7 +52,7 @@ import org.springframework.data.domain.Sort;
 
         return sort;
 
-}
+    }
 
     @Override
 
@@ -59,15 +60,15 @@ import org.springframework.data.domain.Sort;
 
         return new OffsetPageRequest(offset + pageSize, pageSize, sort);
 
-}
+    }
 
     @Override
 
     public Pageable previousOrFirst() {
 
-        return hasPrevious()  ?  new OffsetPageRequest(Math.max(0, offset - pageSize), pageSize, sort)  :  first();
+        return hasPrevious() ? new OffsetPageRequest(Math.max(0, offset - pageSize), pageSize, sort) : first();
 
-}
+    }
 
     @Override
 
@@ -75,7 +76,7 @@ import org.springframework.data.domain.Sort;
 
         return new OffsetPageRequest(0, pageSize, sort);
 
-}
+    }
 
     @Override
 
@@ -85,17 +86,17 @@ import org.springframework.data.domain.Sort;
 
             throw new IllegalArgumentException("Page index must not be negative");
 
-}
+        }
         return new OffsetPageRequest((long) pageNumber * pageSize, pageSize, sort);
 
-}
+    }
 
     @Override
 
     public boolean hasPrevious() {
 
-        return offset >  0;
+        return offset > 0;
 
-}
+    }
 
 }

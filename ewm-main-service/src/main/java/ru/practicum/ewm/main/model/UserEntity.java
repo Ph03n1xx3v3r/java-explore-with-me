@@ -6,30 +6,36 @@ import jakarta.persistence.*;
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(name = "uq_user_email", columnNames = "email"))
 public class UserEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
-    @Column(nullable = false, length = 250) private String name;
-    @Column(nullable = false, unique = true, length = 254) private String email;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false, length = 250)
+    private String name;
+    @Column(nullable = false, unique = true, length = 254)
+    private String email;
 
-    protected UserEntity() {}
+    protected UserEntity() {
+    }
 
 
     public UserEntity(String name, String email) {
- this.name = name; this.email = email;
-}
+        this.name = name;
+        this.email = email;
+    }
 
 
     public Long getId() {
- return id;
-}
+        return id;
+    }
 
 
     public String getName() {
- return name;
-}
+        return name;
+    }
 
 
     public String getEmail() {
- return email;
-}
+        return email;
+    }
 
 }
