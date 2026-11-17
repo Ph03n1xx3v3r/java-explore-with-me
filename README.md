@@ -1,78 +1,83 @@
-# ExploreWithMe — этап 1: сервис статистики
+# ExploreWithMe — этап 2: основной сервис
 
-Проект создан на основе официального шаблона Яндекс Практикума.
+Проект основан на шаблоне Яндекс Практикума и сохраняет реализацию сервиса статистики первого этапа.
 
-## Структура Maven
-- `ewm-stats-dto` — общие DTO `EndpointHit` и `ViewStats`.
-- `ewm-stats-client` — HTTP-клиент сервиса статистики.
-- `ewm-stats-server` — REST API и хранение статистики.
-- `ewm-main-service` — модуль основного сервиса; на этапе 1 его POM содержит только родительский модуль и `artifactId`.
+## Модули
 
-## Используемые технологии
-Java 21, Spring Boot 3.3.2, Spring Web, Spring Data JPA, PostgreSQL, Maven, Docker Compose.
-В сервере статистики присутствует обязательный `spring-boot-starter-actuator`.
+- `ewm-stats-dto` — DTO статистики.
+- `ewm-stats-client` — HTTP-клиент Stats Service.
+- `ewm-stats-server` — сервис статистики и отдельная PostgreSQL.
+- `ewm-main-service` — основной REST-сервис ExploreWithMe и отдельная PostgreSQL.
 
-## Запуск
+Технологии: Java 21, Spring Boot 3.3.2, Spring Web, Spring Data JPA, Jakarta Validation, PostgreSQL, H2 для тестов, Docker Compose. Оба сервиса подключают Spring Boot Actuator.
+
+## Реализованные API-группы
+
+### Публичные
+- `GET /events`, `GET /events/{id}` — поиск, фильтрация, сортировка и просмотр опубликованных событий.
+- `GET /categories`, `GET /categories/{catId}`.
+- `GET /compilations`, `GET /compilations/{compId}`.
+- Каждый запрос к публичному списку событий и подробной информации о событии отправляется в Stats Service.
+
+### Пользовательские
+- Создание, просмотр и изменение собственных событий.
+- Создание и просмотр заявок на участие.
+- Просмотр заявок на событие и изменение их статусов инициатором.
+- Отмена собственной заявки.
+
+### Административные
+- Управление категориями, подборками и пользователями.
+- Поиск событий и публикация/отклонение событий.
+
+## Запуск в Docker
+
 Из корня репозитория:
+
 ```bash
 docker compose up --build
 ```
-Stats API будет доступен на `http://localhost:9090`.
-PostgreSQL доступен с хоста на порту `5433`.
 
-В `docker-compose.yml` также описаны `ewm-service` и `ewm-db` в профиле `stage2`. На первом этапе они не запускаются, поскольку основной сервис ещё не реализуется. Не запускайте профиль `stage2`, пока основной сервис не будет реализован.
+- Main Service: `http://localhost:8080`
+- Stats Service: `http://localhost:9090`
+- Main PostgreSQL: `localhost:5432`
+- Stats PostgreSQL: `localhost:5433`
+
+У каждого сервиса собственный контейнер PostgreSQL и собственный volume. Проверка состояния: `/actuator/health`.
 
 Остановка:
+
 ```bash
 docker compose down
 ```
 
-## API согласно `ewm-stats-service-spec.json`
+## Локальная сборка и тесты
 
-### POST `/hit`
-Пример тела:
-```json
-{
-  "app": "ewm-main-service",
-  "uri": "/events/1",
-  "ip": "192.163.0.1",
-  "timestamp": "2022-09-06 11:00:23"
-}
-```
-Ожидаемый ответ: `201 Created` без тела.
-
-### GET `/stats`
-Обязательные параметры `start` и `end` в формате `yyyy-MM-dd HH:mm:ss`.
-Необязательные параметры:
-- `uris` — повторяемый query-параметр, например `uris=/events&uris=/events/1`;
-- `unique` — `true` для подсчёта уникальных IP, по умолчанию `false`.
-
-Пример:
-```text
-GET /stats?start=2022-09-06%2000:00:00&end=2022-09-07%2000:00:00&unique=true
-```
-
-## Проверки
-Запуск тестов:
 ```bash
-mvn -pl ewm-stats-server -am test
-```
-Сборка всех модулей:
-```bash
+mvn clean test
 mvn clean verify
 ```
 
-Тесты сервера используют H2 и проверяют сохранение обращения, общую статистику, фильтрацию URI, уникальные IP и некорректный формат даты. Тесты HTTP-клиента проверяют отправку POST и получение статистики.
+Для сборки основного сервиса с необходимыми модулями:
 
-## Ветка этапа
-Первый этап должен находиться в отдельной ветке `stat_svc`.
-После создания публичного репозитория на GitHub на основе шаблона:
 ```bash
-git checkout -b stat_svc
-git add .
-git commit -m "Implement statistics service"
-git push -u origin stat_svc
+mvn -pl ewm-main-service -am clean package
 ```
 
+## Ветка второго этапа
+
+Перед работой убедитесь, что изменения первого этапа уже слиты в `main`. Затем создайте ветку второго этапа от актуального `main`:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b main_svc
+git add .
+git commit -m "Implement main service"
+git push -u origin main_svc
+```
+
+Создайте Pull Request из `main_svc` в `main`. После утверждения ревью выполните Merge Pull Request на GitHub.
+
 ## Дополнительная функциональность
-Для дальнейшего этапа выбрана расширенная модерация событий: комментарии администратора при отклонении и повторная отправка исправленного события инициатором.
+
+Для отдельной последующей ветки выбрана расширенная модерация: комментарий администратора при отклонении и повторная отправка исправленного события инициатором. По базовому плану диплома она добавляется после прохождения ревью основной части.
