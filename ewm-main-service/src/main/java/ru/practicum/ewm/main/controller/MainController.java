@@ -5,8 +5,9 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.main.dto.ApiDtos.*;
+import ru.practicum.ewm.main.dto.*;
 import ru.practicum.ewm.main.service.MainService;
+import ru.practicum.ewm.main.model.EventState;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -86,7 +87,7 @@ public class MainController {
     }
 
     @GetMapping("/admin/events")
-    public List<EventFullDto> adminEvents(@RequestParam(required = false) List<Long> users, @RequestParam(required = false) List<String> states, @RequestParam(required = false) List<Long> categories, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd, @RequestParam(defaultValue = "0") int from, @RequestParam(defaultValue = "10") int size) {
+    public List<EventFullDto> adminEvents(@RequestParam(required = false) List<Long> users, @RequestParam(required = false) List<EventState> states, @RequestParam(required = false) List<Long> categories, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd, @RequestParam(defaultValue = "0") int from, @RequestParam(defaultValue = "10") int size) {
         return service.adminEvents(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 

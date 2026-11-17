@@ -13,7 +13,7 @@ import ru.practicum.ewm.main.model.EventEntity;
 import java.util.List;
 import java.util.Optional;
 
-public interface EventRepository extends JpaRepository<EventEntity, Long>, JpaSpecificationExecutor<EventEntity> {
+public interface EventRepository extends JpaRepository<EventEntity, Long>, JpaSpecificationExecutor<EventEntity>, EventRepositoryCustom {
 
     @EntityGraph(attributePaths = {
             "category", "initiator"

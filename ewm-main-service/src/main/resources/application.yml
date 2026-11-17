@@ -8,9 +8,11 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:ewm}
     password: ${SPRING_DATASOURCE_PASSWORD:ewm}
     driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     open-in-view: false
     properties:
       hibernate:

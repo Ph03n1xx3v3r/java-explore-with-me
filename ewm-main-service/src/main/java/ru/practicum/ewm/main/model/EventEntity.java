@@ -34,8 +34,9 @@ public class EventEntity {
     private int participantLimit;
     @Column(name = "request_moderation", nullable = false)
     private boolean requestModeration;
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String state;
+    private EventState state;
     @Column(nullable = false, length = 120)
     private String title;
     @Column(name = "created_on", nullable = false)
@@ -62,7 +63,7 @@ public class EventEntity {
         this.participantLimit = participantLimit;
         this.requestModeration = requestModeration;
         this.title = title;
-        this.state = "PENDING";
+        this.state = EventState.PENDING;
         this.createdOn = LocalDateTime.now();
 
     }
@@ -123,7 +124,7 @@ public class EventEntity {
     }
 
 
-    public String getState() {
+    public EventState getState() {
         return state;
     }
 
@@ -161,23 +162,23 @@ public class EventEntity {
 
 
     public void publish() {
-        state = "PUBLISHED";
+        state = EventState.PUBLISHED;
         publishedOn = LocalDateTime.now();
     }
 
 
     public void reject() {
-        state = "CANCELED";
+        state = EventState.CANCELED;
     }
 
 
     public void cancel() {
-        state = "CANCELED";
+        state = EventState.CANCELED;
     }
 
 
     public void sendToReview() {
-        state = "PENDING";
+        state = EventState.PENDING;
     }
 
 }
